@@ -51,6 +51,9 @@ class Button(avg.DivNode):
                 parent=self
             )
 
+    def setColor(self, color):
+        self._rectNode.fillcolor = color
+
     def setCallback(self, cb):
         self._callback = cb
 
