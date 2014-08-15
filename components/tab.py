@@ -4,6 +4,7 @@ from components.button import Button
 
 class Tab(avg.DivNode):
     name = None
+    _callback = None
 
     def __init__(self, parent, x, y, w, h, name):
         super(Tab, self).__init__(
@@ -24,9 +25,13 @@ class Tab(avg.DivNode):
             button.setCallback(self.onClick)
             i += 1
 
+    def setCallback(self, callback):
+        self._callback = callback
+
     def onClick(self, event, node):
         """
         @type event: libavg.avg.Event
         @type node: Button
         """
-        print self.name, node.name
+        if self._callback:
+            self._callback(self.name, node.name)

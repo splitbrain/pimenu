@@ -1,8 +1,5 @@
 from libavg.avg import LinearAnim
-
-__author__ = 'andi'
-
-from libavg import app, avg
+from libavg import avg
 
 
 class Button(avg.DivNode):
