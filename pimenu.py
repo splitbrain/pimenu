@@ -1,10 +1,13 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 from math import sqrt, floor, ceil
+import os
+import subprocess
 
 import yaml
 import Tkconstants as TkC
 from Tkinter import Tk, Frame, Button, Label, PhotoImage
+import sys
 
 
 class FlatButton(Button):
@@ -19,7 +22,7 @@ class FlatButton(Button):
             fg="white",
             activebackground="#b91d47",  # dark-red
             activeforeground="white",
-            #height=118,
+            # height=118,
             #width=104,
             highlightthickness=0
         )
@@ -43,10 +46,9 @@ class PiMenu(Frame):
         self.parent = parent
         self.pack(fill=TkC.BOTH, expand=1)
 
-        with open('pimenu.yaml', 'r') as f:
+        with open(os.path.dirname(os.path.realpath(sys.argv[0])) + '/pimenu.yaml', 'r') as f:
             self.doc = yaml.load(f)
         self.init()
-
 
     def init(self):
         self.show_items(self.doc)
@@ -54,12 +56,11 @@ class PiMenu(Frame):
     def show_items(self, items, upper=[]):
         num = 0
 
-
         # create a new frame
         wrap = Frame(self, bg="#e3a21a")
         # when there were previous frames, hide the top one and add a back button for the new one
         if len(self.framestack):
-            self.framestack[len(self.framestack) - 1].pack_forget()
+            self.hide_top()
             back = FlatButton(
                 wrap,
                 text='back...',
@@ -67,11 +68,11 @@ class PiMenu(Frame):
                 command=self.go_back,
             )
             back.set_color("#00a300")  # green
-            back.grid(row=0, column=0, padx=1, pady=1, sticky=TkC.W+TkC.E+TkC.N+TkC.S)
+            back.grid(row=0, column=0, padx=1, pady=1, sticky=TkC.W + TkC.E + TkC.N + TkC.S)
             num += 1
         # add the new frame to the stack and display it
-        wrap.pack(fill=TkC.BOTH, expand=1)
         self.framestack.append(wrap)
+        self.show_top()
 
         # calculate tile distribution
         all = len(items) + num
@@ -101,7 +102,7 @@ class PiMenu(Frame):
 
             if 'items' in item:
                 # this is a deeper level
-                btn.configure(command=lambda act=act,item=item: self.show_items(item['items'], act), )
+                btn.configure(command=lambda act=act, item=item: self.show_items(item['items'], act), )
                 btn.set_color("#2b5797")  # dark-blue
             else:
                 # this is an action
@@ -113,10 +114,9 @@ class PiMenu(Frame):
                 column=int(num % cols),
                 padx=1,
                 pady=1,
-                sticky=TkC.W+TkC.E+TkC.N+TkC.S
+                sticky=TkC.W + TkC.E + TkC.N + TkC.S
             )
             num += 1
-
 
     def get_icon(self, name):
         # fixme check for existance
@@ -125,17 +125,40 @@ class PiMenu(Frame):
         self.icons[name] = PhotoImage(file='ico/' + name + '.png')
         return self.icons[name]
 
-    def go_action(selfself, actions):
-        print actions
+    def hide_top(self):
+        self.framestack[len(self.framestack) - 1].pack_forget()
+
+    def show_top(self):
+        self.framestack[len(self.framestack) - 1].pack(fill=TkC.BOTH, expand=1)
+
+    def destroy_top(self):
+        self.framestack[len(self.framestack) - 1].destroy()
+        self.framestack.pop()
+
+    def go_action(self, actions):
+        # hide the menu and show a delay screen
+        self.hide_top()
+        delay = Frame(self, bg="#2d89ef")
+        delay.pack(fill=TkC.BOTH, expand=1)
+        label = Label(delay, text="Executing...", fg="white", bg="#2d89ef", font="Sans 30")
+        label.pack(fill=TkC.BOTH, expand=1)
+        self.parent.update()
+
+        # excute shell script
+        subprocess.call([os.path.dirname(os.path.realpath(sys.argv[0])) + '/pimenu.sh'] + actions,
+                        shell=True)
+
+        # remove delay screen and show menu again
+        delay.destroy()
+        self.show_top()
 
     def go_back(self):
         """
         destroy the current frame and reshow the one below
         :return:
         """
-        self.framestack[len(self.framestack) - 1].destroy()
-        self.framestack.pop()
-        self.framestack[len(self.framestack) - 1].pack(fill=TkC.BOTH, expand=1)
+        self.destroy_top()
+        self.show_top()
 
 
 def main():
