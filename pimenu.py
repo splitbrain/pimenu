@@ -1,126 +1,155 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
-from ConfigParser import SafeConfigParser
-from functools import partial
-import os
-import subprocess
+from math import sqrt, floor, ceil
 
-from libavg import app, avg
-import sys
-from components.button import Button
-from components.tab import Tab
-from components.tabset import TabSet
+import yaml
+import Tkconstants as TkC
+from Tkinter import Tk, Frame, Button, Label, PhotoImage
 
 
-class PiMenu(app.MainDiv):
-    tabs = []
-    busyNode = None
-    executing = False
-
-    def onInit(self):
-        (width, height) = app.instance._resolution
-
-        # create white background
-        avg.RectNode(
-            pos=(0, 0),
-            size=(width, height),
-            fillcolor="FFFFFF",
-            fillopacity=1,
-            strokewidth=0,
-            parent=self
+class FlatButton(Button):
+    def __init__(self, master=None, cnf={}, **kw):
+        Button.__init__(self, master, cnf, **kw)
+        # self.pack()
+        self.config(
+            compound=TkC.TOP,
+            relief=TkC.FLAT,
+            bd=0,
+            bg="#b91d47",  # dark-red
+            fg="white",
+            activebackground="#b91d47",  # dark-red
+            activeforeground="white",
+            #height=118,
+            #width=104,
+            highlightthickness=0
         )
 
-        # parse the config
-        Config = SafeConfigParser()
-        Config.read(os.path.dirname(os.path.realpath(sys.argv[0])) + '/pimenu.ini')
+    def set_color(self, color):
+        self.configure(
+            bg=color,
+            fg="white",
+            activebackground=color,
+            activeforeground="white"
+        )
 
-        # create tabs and buttons
-        tabwidth = width / len(Config.sections())
-        i = 0
-        self.tabs = [TabSet] * len(Config.sections())
-        for section in Config.sections():
-            self.tabs[i] = TabSet()
 
-            self.tabs[i].btn = Button(self, i * tabwidth, 0, tabwidth, 50)
-            self.tabs[i].btn.setText(section)
-            self.tabs[i].btn.name = section
-            self.tabs[i].btn.tabSet = i
-            self.tabs[i].btn.setCallback(self.onTabClick)
+class PiMenu(Frame):
+    doc = None
+    framestack = []
+    icons = {}
 
-            self.tabs[i].tab = Tab(self, 0, 50, width, height - 50, section)
-            self.tabs[i].tab.createButtons(Config.items(section))
-            self.tabs[i].tab.setCallback(self.onExecute)
-            if i == 0:
-                self.tabs[i].activate()
+    def __init__(self, parent):
+        Frame.__init__(self, parent, background="white")
+        self.parent = parent
+        self.pack(fill=TkC.BOTH, expand=1)
+
+        with open('pimenu.yaml', 'r') as f:
+            self.doc = yaml.load(f)
+        self.init()
+
+
+    def init(self):
+        self.show_items(self.doc)
+
+    def show_items(self, items, upper=[]):
+        num = 0
+
+
+        # create a new frame
+        wrap = Frame(self, bg="#e3a21a")
+        # when there were previous frames, hide the top one and add a back button for the new one
+        if len(self.framestack):
+            self.framestack[len(self.framestack) - 1].pack_forget()
+            back = FlatButton(
+                wrap,
+                text='back...',
+                image=self.get_icon("Arrows/up_circular-48"),
+                command=self.go_back,
+            )
+            back.set_color("#00a300")  # green
+            back.grid(row=0, column=0, padx=1, pady=1, sticky=TkC.W+TkC.E+TkC.N+TkC.S)
+            num += 1
+        # add the new frame to the stack and display it
+        wrap.pack(fill=TkC.BOTH, expand=1)
+        self.framestack.append(wrap)
+
+        # calculate tile distribution
+        all = len(items) + num
+        rows = floor(sqrt(all))
+        cols = ceil(all / rows)
+
+        # make cells autoscale
+        for x in range(int(cols)):
+            wrap.columnconfigure(x, weight=1)
+        for y in range(int(rows)):
+            wrap.rowconfigure(y, weight=1)
+
+        # display all given buttons
+        for item in items:
+            act = upper + [item['name']]
+
+            if 'icon' in item:
+                image = self.get_icon(item['icon'])
             else:
-                self.tabs[i].deactivate()
-            i = + 1
+                image = self.get_icon('Alphabet/' + item['label'][0:1].upper() + '-48')
 
-        self.initBusyNode()
+            btn = FlatButton(
+                wrap,
+                text=item['label'],
+                image=image
+            )
 
-    def initBusyNode(self):
-        self.busyNode = avg.DivNode(
-            pos=(0, 0),
-            size=(self.width, self.height),
-            parent=self
-        )
+            if 'items' in item:
+                # this is a deeper level
+                btn.configure(command=lambda act=act,item=item: self.show_items(item['items'], act), )
+                btn.set_color("#2b5797")  # dark-blue
+            else:
+                # this is an action
+                btn.configure(command=lambda act=act: self.go_action(act), )
 
-        avg.RectNode(
-            pos=(0, 0),
-            size=(self.width, self.height),
-            fillcolor="FFFFFF",
-            fillopacity=1,
-            strokewidth=0,
-            parent=self.busyNode
-        )
-        fs = 25
-        avg.WordsNode(
-            pos=(self.width / 2, self.height / 2 - fs / 2),
-            fontsize=fs,
-            text='Please wait...',
-            alignment='center',
-            width=self.width,
-            height=self.height,
-            font='Arial',
-            color='333333',
-            variant='bold',
-            parent=self.busyNode
-        )
-        self.busyNode.active = False
+            # add buton to the grid
+            btn.grid(
+                row=int(floor(num / cols)),
+                column=int(num % cols),
+                padx=1,
+                pady=1,
+                sticky=TkC.W+TkC.E+TkC.N+TkC.S
+            )
+            num += 1
 
-    def onExecute(self, section, button):
-        if self.executing:
-            return
 
-        print section, button
-        self.executing = True
-        self.busyNode.active = True
+    def get_icon(self, name):
+        # fixme check for existance
+        if name in self.icons:
+            return self.icons[name]
+        self.icons[name] = PhotoImage(file='ico/' + name + '.png')
+        return self.icons[name]
 
-        player = avg.Player.get()
-        player.setTimeout(10, partial(self.doExecute, section, button)) # use timeout to leave time for rendering
+    def go_action(selfself, actions):
+        print actions
 
-    def doExecute(self, section, button):
-        subprocess.call([os.path.dirname(os.path.realpath(sys.argv[0])) + '/pimenu.sh', section, button],
-                        shell=True)
-        self.busyNode.active = False
-        self.executing = False
-
-    def onTabClick(self, event, node):
+    def go_back(self):
         """
-        @type event: libavg.avg.Event
-        @type node: Button
+        destroy the current frame and reshow the one below
+        :return:
         """
-        for tab in self.tabs:
-            tab.deactivate()
-
-        self.tabs[node.tabSet].activate()
-
-    def onExit(self):
-        pass
-
-    def onFrame(self):
-        pass
+        self.framestack[len(self.framestack) - 1].destroy()
+        self.framestack.pop()
+        self.framestack[len(self.framestack) - 1].pack(fill=TkC.BOTH, expand=1)
 
 
-app.App().run(PiMenu(), app_resolution='320x240')
+def main():
+    root = Tk()
+    root.geometry("320x240")
+    app = PiMenu(root)
+    root.mainloop()
+
+
+if __name__ == '__main__':
+    main()
+
+
+
+
+
 

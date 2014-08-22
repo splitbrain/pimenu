@@ -1,0 +1,30 @@
+---
+  - 
+    name: "andi"
+    label: "Andi"
+    items: 
+      - 
+        name: "insurance"
+        label: "Insurance"
+      - 
+        name: "invoice"
+        label: "Invoices"
+      - 
+        name: "banking"
+        label: "Banking"
+  - 
+    name: "kaddi"
+    label: "Kaddi"
+    items: 
+      - 
+        name: "insurance"
+        label: "Versicherung"
+      - 
+        name: "invoice"
+        label: "Rechnung"
+      - 
+        name: "banking"
+        label: "Bank"
+      - 
+        name: "home"
+        label: "Wohnung"
