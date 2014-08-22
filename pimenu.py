@@ -7,6 +7,7 @@ import subprocess
 import yaml
 import Tkconstants as TkC
 from Tkinter import Tk, Frame, Button, Label, PhotoImage
+from PIL import Image
 import sys
 
 
@@ -64,7 +65,7 @@ class PiMenu(Frame):
             back = FlatButton(
                 wrap,
                 text='back...',
-                image=self.get_icon("Arrows/up_circular-48"),
+                image=self.get_icon("up_circular"),
                 command=self.go_back,
             )
             back.set_color("#00a300")  # green
@@ -92,7 +93,7 @@ class PiMenu(Frame):
             if 'icon' in item:
                 image = self.get_icon(item['icon'])
             else:
-                image = self.get_icon('Alphabet/' + item['label'][0:1].upper() + '-48')
+                image = self.get_icon(item['label'][0:1].upper())
 
             btn = FlatButton(
                 wrap,
@@ -122,7 +123,7 @@ class PiMenu(Frame):
         # fixme check for existance
         if name in self.icons:
             return self.icons[name]
-        self.icons[name] = PhotoImage(file='ico/' + name + '.png')
+        self.icons[name] = PhotoImage(file='ico/' + name + '.gif')
         return self.icons[name]
 
     def hide_top(self):
