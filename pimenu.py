@@ -65,14 +65,14 @@ class PiMenu(Frame):
         num = 0
 
         # create a new frame
-        wrap = Frame(self, bg="#e3a21a")
+        wrap = Frame(self, bg="black")
         # when there were previous frames, hide the top one and add a back button for the new one
         if len(self.framestack):
             self.hide_top()
             back = FlatButton(
                 wrap,
-                text='back...',
-                image=self.get_icon("up_circular"),
+                text='back…',
+                image=self.get_icon("arrow.left"),
                 command=self.go_back,
             )
             back.set_color("#00a300")  # green
@@ -100,7 +100,7 @@ class PiMenu(Frame):
             if 'icon' in item:
                 image = self.get_icon(item['icon'])
             else:
-                image = self.get_icon(item['label'][0:1].upper())
+                image = self.get_icon('scrabble.'+item['label'][0:1].lower())
 
             btn = FlatButton(
                 wrap,
@@ -110,7 +110,7 @@ class PiMenu(Frame):
 
             if 'items' in item:
                 # this is a deeper level
-                btn.configure(command=lambda act=act, item=item: self.show_items(item['items'], act), )
+                btn.configure(command=lambda act=act, item=item: self.show_items(item['items'], act), text=item['label']+'…')
                 btn.set_color("#2b5797")  # dark-blue
             else:
                 # this is an action
@@ -203,7 +203,8 @@ def main():
     root = Tk()
     root.geometry("320x240")
     root.wm_title('PiMenu')
-    root.wm_attributes('-fullscreen', True)
+    if len(sys.argv) > 1 and sys.argv[1] == 'fs':
+        root.wm_attributes('-fullscreen', True)
     app = PiMenu(root)
     root.mainloop()
 

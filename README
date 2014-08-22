@@ -13,3 +13,12 @@ All tiles are configured in pimenu.yaml
 On the raspberry, install python-yaml:
 
   sudo apt-get install python-yaml
+
+The install comes wih a bunch of icons.
+
+  bunny.gif:    CC-by   http://thenounproject.com/term/rabbit/26062/
+  invoice.gif   CC-by   http://thenounproject.com/term/invoice/60884/
+  ambulance.gif PD      http://thenounproject.com/term/ambulance/597/
+  medical.gif   CC-by   http://thenounproject.com/term/medical/35773/
+  grave.gif     CC-by   http://thenounproject.com/term/grave/29403/
+  All others    CC-by   http://modernuiicons.com/

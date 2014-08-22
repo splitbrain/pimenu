@@ -2,29 +2,96 @@
   - 
     name: "andi"
     label: "Andi"
+    color: "#603cba"
+    icon: "user"
     items: 
       - 
-        name: "insurance"
+        name : "insurance"
         label: "Insurance"
+        color: "#603cba"
+        icon : "shield"
       - 
-        name: "invoice"
+        name : "invoice"
         label: "Invoices"
+        color: "#603cba"
+        icon : "invoice"
       - 
-        name: "banking"
+        name : "banking"
         label: "Banking"
+        color: "#603cba"
+        icon : "currency.dollar"
+      -
+        name : "other"
+        label: "Other"
+        color: "#603cba"
+        icon : "cabinet.files.variant"
   - 
     name: "kaddi"
     label: "Kaddi"
-    items: 
-      - 
-        name: "insurance"
+    color: "#9f00a7"
+    icon: "bunny"
+    items:
+      -
+        name : "versicherung"
         label: "Versicherung"
-      - 
-        name: "invoice"
-        label: "Rechnung"
-      - 
-        name: "banking"
-        label: "Bank"
-      - 
-        name: "home"
+        icon : "shield"
+        items:
+          -
+            name : "leben"
+            label: "Leben"
+            icon : "grave"
+          -
+            name : "rente"
+            label: "Rente"
+            icon : "marvel.shield"
+          -
+            name : "haftpflicht"
+            label: "Haftpflicht"
+            icon : "shield.alert"
+          -
+            name : "unfall"
+            label: "Unfall"
+            icon : "ambulance"
+          -
+            name : "gesundheit"
+            label: "Kranken"
+            icon : "medical"
+          -
+            name : "sozial"
+            label: "Sozial"
+            icon : "share.open"
+          -
+            name : "hausrat"
+            label: "Hausrat"
+            icon : "home"
+      -
+        name : "gehalt"
+        label: "Gehalt"
+        icon : "money"
+      -
+        name : "wisag"
+        label: "Wisag"
+        icon : "clothes.tie"
+      -
+        name : "bhw"
+        label: "BHW"
+      -
+        name : "rechnungen"
+        label: "Rechnungen"
+        icon : "invoice"
+      -
+        name : "wohnung"
         label: "Wohnung"
+        icon : "home"
+      -
+        name : "steuer"
+        label: "Eink.st."
+        icon : "marvel.shield"
+      -
+        name : "bank"
+        label: "Bank"
+        icon : "currency.dollar"
+      -
+        name : "sonstiges"
+        label: "Sonstiges"
+        icon : "cabinet.files.variant"
