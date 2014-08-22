@@ -3,11 +3,9 @@
 from math import sqrt, floor, ceil
 import os
 import subprocess
-
 import yaml
 import Tkconstants as TkC
 from Tkinter import Tk, Frame, Button, Label, PhotoImage
-from PIL import Image
 import sys
 
 
@@ -211,9 +209,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
