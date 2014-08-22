@@ -41,20 +41,27 @@ class PiMenu(Frame):
     doc = None
     framestack = []
     icons = {}
+    path = ''
 
     def __init__(self, parent):
         Frame.__init__(self, parent, background="white")
         self.parent = parent
         self.pack(fill=TkC.BOTH, expand=1)
 
-        with open(os.path.dirname(os.path.realpath(sys.argv[0])) + '/pimenu.yaml', 'r') as f:
+        self.path= os.path.dirname(os.path.realpath(sys.argv[0]))
+        with open(self.path + '/pimenu.yaml', 'r') as f:
             self.doc = yaml.load(f)
-        self.init()
-
-    def init(self):
         self.show_items(self.doc)
 
     def show_items(self, items, upper=[]):
+        """
+        Creates a new page on the stack, automatically adds a back button when there are
+        pages on the stack already
+
+        :param items: list the items to display
+        :param upper: list previous levels' ids
+        :return: None
+        """
         num = 0
 
         # create a new frame
@@ -109,6 +116,9 @@ class PiMenu(Frame):
                 # this is an action
                 btn.configure(command=lambda act=act: self.go_action(act), )
 
+            if 'color' in item:
+                btn.set_color(item['color'])
+
             # add buton to the grid
             btn.grid(
                 row=int(floor(num / cols)),
@@ -120,23 +130,50 @@ class PiMenu(Frame):
             num += 1
 
     def get_icon(self, name):
-        # fixme check for existance
+        """
+        Loads the given icon and keeps a reference
+
+        :param name: string
+        :return:
+        """
         if name in self.icons:
             return self.icons[name]
-        self.icons[name] = PhotoImage(file='ico/' + name + '.gif')
+
+        ico = self.path + '/ico/' + name + '.gif'
+        if not os.path.isfile(ico):
+            ico = self.path + '/ico/cancel.gif'
+
+        self.icons[name] = PhotoImage(file=ico)
         return self.icons[name]
 
     def hide_top(self):
+        """
+        hide the top page
+        :return:
+        """
         self.framestack[len(self.framestack) - 1].pack_forget()
 
     def show_top(self):
+        """
+        show the top page
+        :return:
+        """
         self.framestack[len(self.framestack) - 1].pack(fill=TkC.BOTH, expand=1)
 
     def destroy_top(self):
+        """
+        destroy the top page
+        :return:
+        """
         self.framestack[len(self.framestack) - 1].destroy()
         self.framestack.pop()
 
     def go_action(self, actions):
+        """
+        execute the action script
+        :param actions:
+        :return:
+        """
         # hide the menu and show a delay screen
         self.hide_top()
         delay = Frame(self, bg="#2d89ef")
@@ -146,7 +183,7 @@ class PiMenu(Frame):
         self.parent.update()
 
         # excute shell script
-        subprocess.call([os.path.dirname(os.path.realpath(sys.argv[0])) + '/pimenu.sh'] + actions,
+        subprocess.call([self.path + '/pimenu.sh'] + actions,
                         shell=True)
 
         # remove delay screen and show menu again
@@ -165,6 +202,8 @@ class PiMenu(Frame):
 def main():
     root = Tk()
     root.geometry("320x240")
+    root.wm_title('PiMenu')
+    root.wm_attributes('-fullscreen', True)
     app = PiMenu(root)
     root.mainloop()
 
