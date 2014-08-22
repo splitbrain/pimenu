@@ -1,0 +1,34 @@
+html, body {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    flex-grow: 0;
+}
+
+nav button {
+    flex-grow: 1;
+}
+
+section {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    flex-grow: 1;
+}
+
+section button {
+    flex-grow: 1;
+}
+
