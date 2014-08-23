@@ -1,4 +1,9 @@
 {
-  "name": "nw-demo",
-  "main": "index.html"
+  "name": "pimenu",
+  "main": "index.html",
+  "window" : {
+    "width": 320,
+    "height": 240,
+    "toolbar": false
+  }
 }
