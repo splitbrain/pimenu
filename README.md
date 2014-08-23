@@ -50,4 +50,5 @@ The install comes wih a bunch of icons with their own licenses as listed below:
 * ambulance.gif PD      http://thenounproject.com/term/ambulance/597/
 * medical.gif   CC-by   http://thenounproject.com/term/medical/35773/
 * grave.gif     CC-by   http://thenounproject.com/term/grave/29403/
+* fish.gif      CC-by   http://thenounproject.com/term/fish/19775/
 * all others    CC-by   http://modernuiicons.com/

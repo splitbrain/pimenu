@@ -9,7 +9,7 @@
     name: "andi"
     label: "Andi"
     color: "#603cba"
-    icon: "user"
+    icon: "fish"
     items: 
       - 
         name : "insurance"
