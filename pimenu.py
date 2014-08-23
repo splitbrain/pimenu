@@ -166,6 +166,14 @@ class PiMenu(Frame):
         self.framestack[len(self.framestack) - 1].destroy()
         self.framestack.pop()
 
+    def destroy_all(self):
+        """
+        destroy all pages except the first aka. go back to start
+        :return:
+        """
+        while len(self.framestack) > 1:
+            self.destroy_top()
+
     def go_action(self, actions):
         """
         execute the action script
@@ -185,6 +193,7 @@ class PiMenu(Frame):
 
         # remove delay screen and show menu again
         delay.destroy()
+        self.destroy_all()
         self.show_top()
 
     def go_back(self):
