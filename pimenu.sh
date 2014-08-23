@@ -1,8 +1,11 @@
 #!/bin/bash
 #
-# This is just an example. Whatever any action tile (eg. that is has no sub
-# items) will trigger this script. The names of the pages and of the clicked
-# button will be passed as arguments. Use those to decide what to do.
+# This is just an example. It simply prints all passed parameters and sleeps
+# 5 seconds.
 #
-echo $1 $2
+# Any action tile (eg. any tile with no sub items) will trigger this script.
+# The names of the pages and of the clicked tile will be passed as arguments.
+# Use those to decide what to do.
+
+echo "$*"
 sleep 5

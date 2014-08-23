@@ -181,8 +181,7 @@ class PiMenu(Frame):
         self.parent.update()
 
         # excute shell script
-        subprocess.call([self.path + '/pimenu.sh'] + actions,
-                        shell=True)
+        subprocess.call([self.path + '/pimenu.sh'] + actions)
 
         # remove delay screen and show menu again
         delay.destroy()
