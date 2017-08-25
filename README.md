@@ -13,14 +13,21 @@ On the Raspberry, install python-yaml:
 
     sudo apt-get install python-yaml
 
+Copy the example configs before running the script:
+
+    cp pimenu.yaml{.dist,}
+    cp pimenu.sh{.dist,}
+
 The app can be started in fullscreen by passing ```fs``` as first parameter.
+
+    ./pimenu.py fs
 
 ![Screenshot](screenshot.png)
 
 License
 -------
 
-Copyright (c) 2014 Andreas Gohr
+Copyright (c) 2014-2017 Andreas Gohr
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
