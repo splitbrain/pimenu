@@ -1,18 +1,19 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
-from math import sqrt, floor, ceil
+import Tkconstants as TkC
 import os
 import subprocess
-import yaml
-import Tkconstants as TkC
-from Tkinter import Tk, Frame, Button, Label, PhotoImage
 import sys
+from Tkinter import Tk, Frame, Button, Label, PhotoImage
+from math import sqrt, floor, ceil
+
+import yaml
 
 
 class FlatButton(Button):
-    def __init__(self, master=None, cnf={}, **kw):
+    def __init__(self, master=None, cnf=None, **kw):
         Button.__init__(self, master, cnf, **kw)
-        # self.pack()
+
         self.config(
             compound=TkC.TOP,
             relief=TkC.FLAT,
@@ -21,8 +22,6 @@ class FlatButton(Button):
             fg="white",
             activebackground="#b91d47",  # dark-red
             activeforeground="white",
-            # height=118,
-            #width=104,
             highlightthickness=0
         )
 
@@ -46,7 +45,7 @@ class PiMenu(Frame):
         self.parent = parent
         self.pack(fill=TkC.BOTH, expand=1)
 
-        self.path= os.path.dirname(os.path.realpath(sys.argv[0]))
+        self.path = os.path.dirname(os.path.realpath(sys.argv[0]))
         self.initialize()
 
     def initialize(self):
@@ -61,11 +60,10 @@ class PiMenu(Frame):
         self.lastinit = os.path.getmtime(self.path + '/pimenu.yaml')
 
         if len(self.framestack):
-            self.destroy_all();
-            self.destroy_top();
+            self.destroy_all()
+            self.destroy_top()
 
         self.show_items(doc)
-        print "initalized"
 
     def has_config_changed(self):
         """
@@ -73,12 +71,9 @@ class PiMenu(Frame):
 
         :return: Boolean
         """
-        now = os.path.getmtime(self.path + '/pimenu.yaml')
+        return self.lastinit != os.path.getmtime(self.path + '/pimenu.yaml')
 
-        print "check %s %s" % (now, self.lastinit)
-        return now != self.lastinit
-
-    def show_items(self, items, upper=[]):
+    def show_items(self, items, upper=None):
         """
         Creates a new page on the stack, automatically adds a back button when there are
         pages on the stack already
@@ -87,6 +82,8 @@ class PiMenu(Frame):
         :param upper: list previous levels' ids
         :return: None
         """
+        if upper is None:
+            upper = []
         num = 0
 
         # create a new frame
@@ -110,9 +107,9 @@ class PiMenu(Frame):
         self.show_top()
 
         # calculate tile distribution
-        all = len(items) + num
-        rows = floor(sqrt(all))
-        cols = ceil(all / rows)
+        allitems = len(items) + num
+        rows = floor(sqrt(allitems))
+        cols = ceil(allitems / rows)
 
         # make cells autoscale
         for x in range(int(cols)):
@@ -127,7 +124,7 @@ class PiMenu(Frame):
             if 'icon' in item:
                 image = self.get_icon(item['icon'])
             else:
-                image = self.get_icon('scrabble.'+item['label'][0:1].lower())
+                image = self.get_icon('scrabble.' + item['label'][0:1].lower())
 
             btn = FlatButton(
                 wrap,
@@ -137,7 +134,8 @@ class PiMenu(Frame):
 
             if 'items' in item:
                 # this is a deeper level
-                btn.configure(command=lambda act=act, item=item: self.show_items(item['items'], act), text=item['label']+'…')
+                btn.configure(command=lambda act=act, item=item: self.show_items(item['items'], act),
+                              text=item['label'] + '…')
                 btn.set_color("#2b5797")  # dark-blue
             else:
                 # this is an action
@@ -244,7 +242,7 @@ def main():
     root.wm_title('PiMenu')
     if len(sys.argv) > 1 and sys.argv[1] == 'fs':
         root.wm_attributes('-fullscreen', True)
-    app = PiMenu(root)
+    PiMenu(root)
     root.mainloop()
 
 
