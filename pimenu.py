@@ -164,9 +164,11 @@ class PiMenu(Frame):
         if name in self.icons:
             return self.icons[name]
 
-        ico = self.path + '/ico/' + name + '.gif'
+        ico = self.path + '/ico/' + name + '.png'
         if not os.path.isfile(ico):
-            ico = self.path + '/ico/cancel.gif'
+            ico = self.path + '/ico/' + name + '.gif'
+            if not os.path.isfile(ico):
+                ico = self.path + '/ico/cancel.gif'
 
         self.icons[name] = PhotoImage(file=ico)
         return self.icons[name]
