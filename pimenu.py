@@ -36,10 +36,10 @@ class FlatButton(Button):
 
 
 class PiMenu(Frame):
-    doc = None
     framestack = []
     icons = {}
     path = ''
+    lastinit = 0
 
     def __init__(self, parent):
         Frame.__init__(self, parent, background="white")
@@ -47,9 +47,36 @@ class PiMenu(Frame):
         self.pack(fill=TkC.BOTH, expand=1)
 
         self.path= os.path.dirname(os.path.realpath(sys.argv[0]))
+        self.initialize()
+
+    def initialize(self):
+        """
+        (re)load the the items from the yaml configuration and (re)init
+        the whole menu system
+
+        :return: None
+        """
         with open(self.path + '/pimenu.yaml', 'r') as f:
-            self.doc = yaml.load(f)
-        self.show_items(self.doc)
+            doc = yaml.load(f)
+        self.lastinit = os.path.getmtime(self.path + '/pimenu.yaml')
+
+        if len(self.framestack):
+            self.destroy_all();
+            self.destroy_top();
+
+        self.show_items(doc)
+        print "initalized"
+
+    def has_config_changed(self):
+        """
+        Checks if the configuration has been changed since last loading
+
+        :return: Boolean
+        """
+        now = os.path.getmtime(self.path + '/pimenu.yaml')
+
+        print "check %s %s" % (now, self.lastinit)
+        return now != self.lastinit
 
     def show_items(self, items, upper=[]):
         """
@@ -64,8 +91,9 @@ class PiMenu(Frame):
 
         # create a new frame
         wrap = Frame(self, bg="black")
-        # when there were previous frames, hide the top one and add a back button for the new one
+
         if len(self.framestack):
+            # when there were previous frames, hide the top one and add a back button for the new one
             self.hide_top()
             back = FlatButton(
                 wrap,
@@ -76,6 +104,7 @@ class PiMenu(Frame):
             back.set_color("#00a300")  # green
             back.grid(row=0, column=0, padx=1, pady=1, sticky=TkC.W + TkC.E + TkC.N + TkC.S)
             num += 1
+
         # add the new frame to the stack and display it
         self.framestack.append(wrap)
         self.show_top()
@@ -198,11 +227,15 @@ class PiMenu(Frame):
 
     def go_back(self):
         """
-        destroy the current frame and reshow the one below
+        destroy the current frame and reshow the one below, except when the config has changed
+        then reinitialize everything
         :return:
         """
-        self.destroy_top()
-        self.show_top()
+        if self.has_config_changed():
+            self.initialize()
+        else:
+            self.destroy_top()
+            self.show_top()
 
 
 def main():
